@@ -2,8 +2,8 @@
 and may not be redistributed without written permission.*/
 
 //Using SDL, SDL_image, standard IO, math, and strings
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
+#include <SDL.h>
+#include <SDL_image.h>
 #include <stdio.h>
 #include <string>
 #include <cmath>
@@ -138,11 +138,12 @@ SDL_Texture* loadTexture( std::string path )
 
 int main( int argc, char* args[] )
 {
+	auto M = std::make_unique<Model>();
 
-	auto view = std::make_unique<View>(100,100,50,200,SCREEN_WIDTH,SCREEN_HEIGHT);
-
-	auto v1 = std::make_unique<Vehicle>(130,120,2,4,0,0,0,255);
-	v1->display();
+	M->addVehicle(std::make_unique<Vehicle>(130,120,2,4,0,0,0,255,*M));
+	M->addVehicle(std::make_unique<Vehicle>(130,140,2,4,0,0,0,255,*M));
+	
+	M->addView(std::make_unique<View>(100,100,70,250,SCREEN_WIDTH,SCREEN_HEIGHT,*M));
 
 	//=================================================================================
 
@@ -183,7 +184,7 @@ int main( int argc, char* args[] )
 				SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
 				SDL_RenderClear( gRenderer );
 
-				v1->render(gRenderer);
+				M->views[0]->render(gRenderer);
 
 				//Update screen
 				SDL_RenderPresent( gRenderer );
