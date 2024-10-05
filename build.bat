@@ -29,7 +29,7 @@ if not exist %objDir% mkdir %objDir%
 
 cl %compileFlags% %source% %libs% %linkFlags%
 
-move %outputExe%.exe ..
+copy %outputExe%.exe ..
 
 popd
 

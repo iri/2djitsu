@@ -140,10 +140,14 @@ int main( int argc, char* args[] )
 {
 	auto M = std::make_unique<Model>();
 
-	M->addVehicle(std::make_unique<Vehicle>(130,120,2,4,0,0,0,255,*M));
-	M->addVehicle(std::make_unique<Vehicle>(130,140,2,4,0,0,0,255,*M));
+	M->addVehicle(std::make_unique<Vehicle>(-3,0,2,4,0,0,0,255,*M));
+	M->addVehicle(std::make_unique<Vehicle>(0,0,2,4,0,0,0,255,*M));
+	M->addVehicle(std::make_unique<Vehicle>(3,0,2,4,0,0,255,255,*M));
 	
-	M->addView(std::make_unique<View>(100,100,70,250,SCREEN_WIDTH,SCREEN_HEIGHT,*M));
+	M->addView(std::make_unique<View>(0,0,10,10,SCREEN_WIDTH,SCREEN_HEIGHT,*M));
+
+	M->display();
+
 
 	//=================================================================================
 
@@ -184,7 +188,7 @@ int main( int argc, char* args[] )
 				SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
 				SDL_RenderClear( gRenderer );
 
-				M->views[0]->render(gRenderer);
+				M->render(gRenderer);
 
 				//Update screen
 				SDL_RenderPresent( gRenderer );
