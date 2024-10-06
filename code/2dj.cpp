@@ -140,11 +140,15 @@ int main( int argc, char* args[] )
 {
 	auto M = std::make_unique<Model>();
 
-	M->addVehicle(std::make_unique<Vehicle>(-3,0,2,4,0,0,0,255,*M));
-	M->addVehicle(std::make_unique<Vehicle>(0,0,2,4,0,0,0,255,*M));
-	M->addVehicle(std::make_unique<Vehicle>(3,0,2,4,0,0,255,255,*M));
+	int v;
 	
-	M->addView(std::make_unique<View>(0,0,10,10,SCREEN_WIDTH,SCREEN_HEIGHT,*M));
+	v = M->addVehicle(std::make_unique<Vehicle>(2, 4, 0.5,0.5, 0,0,0,255, *M));
+	v = M->addVehicle(std::make_unique<Vehicle>(2, 4, 0.5,0.5, 0,0,0,255, *M));
+
+	M->setVehicle( 0, 0, 3, 80, 0, 0, 0 );
+	M->setVehicle( 1, 0, -3, 120, 0, 0, 0 );
+
+	M->addView(std::make_unique<View>(0,0,15,20,SCREEN_WIDTH,SCREEN_HEIGHT,*M));
 
 	M->display();
 
