@@ -69,6 +69,8 @@ bool init()
 			}
 			else
 			{
+				SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND);
+
 				//Initialize renderer color
 				SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
 
@@ -140,15 +142,15 @@ int main( int argc, char* args[] )
 {
 	auto M = std::make_unique<Model>();
 
-	int v;
-	
-	v = M->addVehicle(std::make_unique<Vehicle>(2, 4, 0.5,0.5, 0,0,0,255, *M));
-	v = M->addVehicle(std::make_unique<Vehicle>(2, 4, 0.5,0.5, 0,0,0,255, *M));
+	M->addVehicle(std::make_unique<Vehicle>(2, 4, 0.5,0.5, 0,255,0,200, *M));
+	M->addVehicle(std::make_unique<Vehicle>(2, 4, 0.5,0.5, 255,0,0,200, *M));
+	M->addVehicle(std::make_unique<Vehicle>(2, 4, 0.5,0.5, 0,0,255,200, *M));
 
-	M->setVehicle( 0, 0, 3, 80, 0, 0, 0 );
-	M->setVehicle( 1, 0, -3, 120, 0, 0, 0 );
+	M->setVehicle( 0, 0, 0, 45, 20, 0, 0 );
+	M->setVehicle( 1, 0, 6, 120, 0, 0, 0 );
+	M->setVehicle( 2, -3, -7, 90, 10, 0, 0 );
 
-	M->addView(std::make_unique<View>(0,0,15,20,SCREEN_WIDTH,SCREEN_HEIGHT,*M));
+	M->addView(std::make_unique<View>(0,0,30,40,SCREEN_WIDTH,SCREEN_HEIGHT,*M));
 
 	M->display();
 

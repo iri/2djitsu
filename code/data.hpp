@@ -63,26 +63,76 @@ private:
     float t, dt;
     Model& M;
 
-    float _x,_y, _xf,_yf;
-    float _xfr,_yfr;
-    float _xfl,_yfl;
-    float _xr,_yr;
-    float _xl,_yl;
-
-    inline void rotatePoint(float& x, float& y, float theta, float cx, float cy) {
-        x -= cx;
-        y -= cy;
-        float cosTheta = std::cos(theta);
-        float sinTheta = std::sin(theta);
-        float xNew = x * cosTheta - y * sinTheta;
-        float yNew = x * sinTheta + y * cosTheta;
-        x = xNew + cx;
-        y = yNew + cy;
+    inline void translatePoint(SDL_FPoint *p, SDL_FPoint *T) {
+        p->x += T->x;
+        p->y += T->y;
     }
 
-    inline void translatePoint(float& x, float& y, float dx, float dy) {
-        x += dx;
-        y += dy;
+    inline void rotatePoint(SDL_FPoint *p, float theta, SDL_FPoint *p0) {
+        p->x -= p0->x;
+        p->y -= p0->y;
+        float cosTheta = std::cos(theta);
+        float sinTheta = std::sin(theta);
+        float xNew = p->x * cosTheta - p->y * sinTheta;
+        float yNew = p->x * sinTheta + p->y * cosTheta;
+        p->x = xNew + p0->x;
+        p->y = yNew + p0->y;
+    }
+
+    inline void drawRectangle(SDL_Renderer *renderer, SDL_FPoint *p, float w, float h, float theta, int view_id) {
+        SDL_FPoint p1,p2,p3,p4;
+        float w2 = w/2, h2 = h/2;
+        p1 = *p; p1.x -= w2; p1.y -= h2;
+        p2 = *p; p2.x += w2; p2.y -= h2;
+        p3 = *p; p3.x += w2; p3.y += h2;
+        p4 = *p; p4.x -= w2; p4.y += h2;
+        rotatePoint(&p1, theta, p);
+        rotatePoint(&p2, theta, p);
+        rotatePoint(&p3, theta, p);
+        rotatePoint(&p4, theta, p);
+        SDL_Vertex vertices[4] = {
+            {{to_scr_x(p1.x,view_id), to_scr_y(p1.y,view_id)}, {0, 0, 0, 255}, {0, 0}},
+            {{to_scr_x(p2.x,view_id), to_scr_y(p2.y,view_id)}, {0, 0, 0, 255}, {0, 0}},
+            {{to_scr_x(p3.x,view_id), to_scr_y(p3.y,view_id)}, {0, 0, 0, 255}, {0, 0}},
+            {{to_scr_x(p4.x,view_id), to_scr_y(p4.y,view_id)}, {0, 0, 0, 255}, {0, 0}}
+        };
+        int indices[6] = {
+            0, 1, 2, 
+            0, 2, 3  
+        };
+        SDL_RenderGeometry(renderer, NULL, vertices, 4, indices, 6);
+    }
+
+    inline void drawBody(SDL_Renderer *renderer, SDL_FPoint *p, float w, float h, float theta, int view_id) {
+        SDL_FPoint p1,p2,p3,p4;
+        float w2 = w/2, h2 = h/2;
+        p1 = *p;
+        p1.x -= this->b;
+        p1.y -= h2;
+        p2 = *p;
+        p2.x += 2 * w2 - this->b;
+        p2.y -= h2;
+        p3 = *p;
+        p3.x += 2 * w2 - this->b;
+        p3.y += h2;
+        p4 = *p;
+        p4.x -= this->b;
+        p4.y += h2;
+        rotatePoint(&p1, theta, p);
+        rotatePoint(&p2, theta, p);
+        rotatePoint(&p3, theta, p);
+        rotatePoint(&p4, theta, p);
+        SDL_Vertex vertices[4] = {
+            {{to_scr_x(p1.x,view_id), to_scr_y(p1.y,view_id)}, {this->red, this->green, this->blue, this->alpha}, {0, 0}},
+            {{to_scr_x(p2.x,view_id), to_scr_y(p2.y,view_id)}, {this->red, this->green, this->blue, this->alpha}, {0, 0}},
+            {{to_scr_x(p3.x,view_id), to_scr_y(p3.y,view_id)}, {this->red, this->green, this->blue, this->alpha}, {0, 0}},
+            {{to_scr_x(p4.x,view_id), to_scr_y(p4.y,view_id)}, {this->red, this->green, this->blue, this->alpha}, {0, 0}}
+        };
+        int indices[6] = {
+            0, 1, 2, 
+            0, 2, 3  
+        };
+        SDL_RenderGeometry(renderer, NULL, vertices, 4, indices, 6);
     }
 
     inline int to_scr_x(float x, int view_id);
@@ -316,57 +366,69 @@ void Vehicle::display(int view_id) const {
                 << std::endl;
 }
 
+
 void Vehicle::render(SDL_Renderer *renderer, int view_id) {
     std::unique_ptr<View>& V = M.views[view_id];
     SDL_Rect rect;
+    SDL_FPoint p1,p2,p3,T;
+
+    // Color
     SDL_SetRenderDrawColor( renderer, red, green, blue, alpha );
-    rect = { to_scr_x(x,view_id), to_scr_y(y,view_id), to_scr_d(w,view_id), to_scr_d(h,view_id) };
-    SDL_RenderDrawRect( renderer, &rect );
 
     // Base
-    _x = this->x;
-    _y = this->y;
-    _xf = _x;
-    _yf = _y;
-    translatePoint( _xf, _yf, L, 0 );
-    rotatePoint( _xf, _yf, this->theta, _x, _y );
-    SDL_RenderDrawLine(renderer, to_scr_x(_x,view_id), to_scr_y(_y,view_id), to_scr_x(_xf,view_id), to_scr_y(_yf,view_id));
+    p1 = { this->x, this->y };
+
+    p2 = p1;
+    T = {L,0};
+    translatePoint( &p2, &T );
+    rotatePoint( &p2, this->theta, &p1 );
+    // SDL_RenderDrawLine(renderer, to_scr_x(p1.x,view_id), to_scr_y(p1.y,view_id), to_scr_x(p2.x,view_id), to_scr_y(p2.y,view_id));
 
     // Front
 
-
-    // Front right
-    _xfr = _xf;
-    _yfr = _yf;
-    translatePoint( _xfr, _yfr, this->w/2, 0 );
-    rotatePoint( _xfr, _yfr, this->theta-M_PI/2, _xf, _yf );
-    SDL_RenderDrawLine(renderer, to_scr_x(_xf,view_id), to_scr_y(_yf,view_id), to_scr_x(_xfr,view_id), to_scr_y(_yfr,view_id));
-
     // Front right wheel
+    p3 = p2;
+    T = {this->w/2,0};
+    translatePoint( &p3, &T );
+    rotatePoint( &p3, this->theta-M_PI/2, &p2 );
+    // SDL_RenderDrawLine(renderer, to_scr_x(p2.x,view_id), to_scr_y(p2.y,view_id), to_scr_x(p3.x,view_id), to_scr_y(p3.y,view_id));
+
+    drawRectangle( renderer, &p3, this->f*2, 0.20, this->theta+this->phi, view_id );
+
+    // Front left wheel
+    p3 = p2;
+    T = {this->w/2,0};
+    translatePoint( &p3, &T );
+    rotatePoint( &p3, this->theta+M_PI/2, &p2 );
+    // SDL_RenderDrawLine(renderer, to_scr_x(p2.x,view_id), to_scr_y(p2.y,view_id), to_scr_x(p3.x,view_id), to_scr_y(p3.y,view_id));
+
+    drawRectangle( renderer, &p3, this->f*2, 0.20, this->theta+this->phi, view_id );
 
 
-    // Front left
-    _xfl = _xf;
-    _yfl = _yf;
-    translatePoint( _xfl, _yfl, this->w/2, 0 );
-    rotatePoint( _xfl, _yfl, this->theta+M_PI/2, _xf, _yf );
-    SDL_RenderDrawLine(renderer, to_scr_x(_xf,view_id), to_scr_y(_yf,view_id), to_scr_x(_xfl,view_id), to_scr_y(_yfl,view_id));
+    // Back right wheel
+    p2 = p1;
+    T = {this->w/2,0};
+    translatePoint( &p2, &T );
+    rotatePoint( &p2, this->theta-M_PI/2, &p1 );
+    // SDL_RenderDrawLine(renderer, to_scr_x(p1.x,view_id), to_scr_y(p1.y,view_id), to_scr_x(p2.x,view_id), to_scr_y(p2.y,view_id));
 
-    // Back
-    
-    // Back right
-    _xr = _x;
-    _yr = _y;
-    translatePoint( _xr, _yr, this->w/2, 0 );
-    rotatePoint( _xr, _yr, this->theta-M_PI/2, _x, _y );
-    SDL_RenderDrawLine(renderer, to_scr_x(_x,view_id), to_scr_y(_y,view_id), to_scr_x(_xr,view_id), to_scr_y(_yr,view_id));
+    drawRectangle( renderer, &p2, this->f*2, 0.20, this->theta, view_id );
 
-    // Back left
-    _xl = _x;
-    _yl = _y;
-    translatePoint( _xl, _yl, this->w/2, 0 );
-    rotatePoint( _xl, _yl, this->theta+M_PI/2, _x, _y );
-    SDL_RenderDrawLine(renderer, to_scr_x(_x,view_id), to_scr_y(_y,view_id), to_scr_x(_xl,view_id), to_scr_y(_yl,view_id));
+    // Back left wheel
+    p2 = p1;
+    T = {this->w/2,0};
+    translatePoint( &p2, &T );
+    rotatePoint( &p2, this->theta+M_PI/2, &p1 );
+    // SDL_RenderDrawLine(renderer, to_scr_x(p1.x,view_id), to_scr_y(p1.y,view_id), to_scr_x(p2.x,view_id), to_scr_y(p2.y,view_id));
+
+    drawRectangle( renderer, &p2, this->f*2, 0.20, this->theta, view_id );
+
+
+    p1 = {this->x, this->y};
+    drawBody( renderer, &p1, this->h, this->w, this->theta, view_id );
+
+    // p1 = {this->x, this->y};
+    // drawRectangle( renderer, &p1, 0.2, 0.2, 0, view_id );
 }
 
 
