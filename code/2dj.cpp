@@ -139,9 +139,7 @@ SDL_Texture* loadTexture( std::string path )
 
 
 int main( int argc, char* args[] )
-{
-	auto start = std::chrono::steady_clock::now();
-	
+{	
 	auto M = std::make_unique<Model>();
 
 	M->addVehicle(std::make_unique<Vehicle>(2, 4, 0.5,0.5, 0,255,0,200, *M));
@@ -176,6 +174,10 @@ int main( int argc, char* args[] )
 		}
 		else
 		{	
+			std::chrono::steady_clock::time_point t0,t;
+			t0 = std::chrono::steady_clock::now();
+			long long elapsed;
+			
 			//Main loop flag
 			bool quit = false;
 
@@ -203,6 +205,16 @@ int main( int argc, char* args[] )
 
 				//Update screen
 				SDL_RenderPresent( gRenderer );
+
+				do {
+					std::this_thread::sleep_for(std::chrono::microseconds(1000));
+					t = std::chrono::steady_clock::now();
+					elapsed = std::chrono::duration_cast<std::chrono::microseconds>(t-t0).count();
+				} while ( elapsed < 10000 );  // 100FPS
+
+		        // std::cout << "FPS: " << 1 / 0.000001 / elapsed << std::endl;
+				t0 = t;
+
 			}
 		}
 	}
