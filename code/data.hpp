@@ -6,6 +6,8 @@
 #include <utility>
 #include <cmath>
 #include <fstream>
+#include <chrono>
+#include <thread>
 
 
 class Vehicle;
@@ -13,14 +15,16 @@ class View;
 
 
 class Model {
+public:
     enum modelState {
         IDLE = 1,
-        STARTED = 2
+        RUNNING = 2,
+        FINISHED = 3
     };
     enum modelState state = IDLE;
-public:
     std::vector<std::unique_ptr<Vehicle>> vehicles;
     std::vector<std::unique_ptr<View>> views;
+    float dt = 10;  // ms
 
     Model() = default;
 
@@ -34,11 +38,15 @@ public:
     }
 
     void start() {
-        state = STARTED;
+        state = RUNNING;
     }
     
     void stop() {
         state = IDLE;
+    }
+
+    void exit() {
+        state = FINISHED;
     }
 
     void display() const;
@@ -60,7 +68,7 @@ private:
     float v, a;
     uint8_t red, green, blue, alpha;
     float dx, dy, dtheta;
-    float t, dt;
+    std::thread Thread;
     Model& M;
 
     inline void translatePoint(SDL_FPoint *p, SDL_FPoint *T) {
@@ -107,15 +115,15 @@ private:
         SDL_FPoint p1,p2,p3,p4;
         float w2 = w/2, h2 = h/2;
         p1 = *p;
+        p2 = *p;
+        p3 = *p;
+        p4 = *p;
         p1.x -= this->b;
         p1.y -= h2;
-        p2 = *p;
         p2.x += 2 * w2 - this->b;
         p2.y -= h2;
-        p3 = *p;
         p3.x += 2 * w2 - this->b;
         p3.y += h2;
-        p4 = *p;
         p4.x -= this->b;
         p4.y += h2;
         rotatePoint(&p1, theta, p);
@@ -146,9 +154,10 @@ public:
         float w, float h, 
         float f, float b,
         uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha,
-        Model& mref) : w(w), h(h), f(f), b(b), red(red), green(green), blue(blue), alpha(alpha), M(mref) {
+        Model& mref) : w(w), h(h), f(f), b(b), red(red), green(green), blue(blue), alpha(alpha), M(mref), Thread() {
             id = M.vehicles.size();
             L = h - f - b;
+            startTask();
         }
 
     void set( float x, float y, float theta, float phi, float v, float a )
@@ -157,24 +166,58 @@ public:
         this->y = y;
         this->theta = theta*M_PI/180;
         this->phi = phi*M_PI/180;
-        this->v = v;
+        this->v = v/3.6;
         this->a = a;
     }
 
-    // int car_nextstate( float phi, float v )
-    // {
-    //     v = v / 3.6;
-    //     phi = phi / 180.0 * 3.1415926;
-    //     dx = v * cos(theta);
-    //     dy = v * sin(theta);
-    //     dtheta = v/L * tan(phi);
-    //     x = x + dx*dt;
-    //     y = y + dy*dt;
-    //     theta = theta + dtheta*dt;
-    //     t = t + dt;
-    //     v = v;
-    //     return 0;
-    // }
+    void next_state()
+    {
+        // compute differences
+        this->dx = this->v * std::cos(this->theta);
+        this->dy = this->v * std::sin(this->theta);
+        this->dtheta = this->v/this->L * std::tan(this->phi);
+
+        // update state
+        this->x = this->x + this->dx * this->M.dt;
+        this->y = this->y + this->dy * this->M.dt;
+        this->theta = this->theta + this->dtheta * this->M.dt;
+        // this->v = this->v + this->a * this->M.dt;
+
+        // std::cout 
+        //     << "  " << this->M.dt 
+        //     << "  " << this->v 
+        // << std::endl;
+    }
+
+    void task(int id) {
+        std::chrono::steady_clock::time_point start,end;
+        long long elapsed;
+
+        std::cout << "Vehicle " << id << " thread started." << std::endl;
+        
+        while (M.state != M.FINISHED) {
+
+            start = std::chrono::steady_clock::now();
+
+            if (M.state==M.RUNNING) {
+                next_state();
+            }
+
+            do {
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                end = std::chrono::steady_clock::now();
+                elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+            } while ( elapsed < this->M.dt );
+
+            // std::cout << "Milliseconds: " << elapsed << std::endl;
+        }
+
+        std::cout << "Vehicle " << id << " thread finished." << std::endl;
+    }
+
+    void startTask() {
+        this->Thread = std::thread(&Vehicle::task, this, this->id);
+    }
 
     void display(int view_id) const;
 
@@ -357,7 +400,7 @@ inline int Vehicle::to_scr_d(float d, int view_id) {
 void Vehicle::display(int view_id) const {
     std::unique_ptr<View>& V = M.views[view_id];
 
-    V->display();
+    // V->display();
 
     std::cout << "  Vehicle:  id=" << id 
                 << "    x:" << x << " y:" << y << " w:" << w
