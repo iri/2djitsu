@@ -10,8 +10,8 @@ pushd %buildDir%
 set objDir=%buildDir%\obj\
 set outputExe=%buildDir%\2dj
 set libs=SDL2.lib SDL2main.lib SDL2_image.lib shell32.lib
-set source=%buildDir%\..\code\2dj.cpp
-set INCLUDE=%buildDir%\..\code;%INCLUDE%
+set source=%buildDir%\..\src\2dj.cpp
+set INCLUDE=%buildDir%\..\src;%INCLUDE%
 
 
 :: compiler flags:
