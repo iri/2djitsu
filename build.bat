@@ -28,7 +28,6 @@ set linkFlags=/link /SUBSYSTEM:CONSOLE
 if not exist %objDir% mkdir %objDir%
 
 cl %compileFlags% %source% %libs% %linkFlags%
-
 copy %outputExe%.exe ..
 
 popd

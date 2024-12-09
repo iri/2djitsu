@@ -53,7 +53,9 @@ public:
 
     void render(SDL_Renderer *renderer) const;
 
-    void Model::setVehicle( int id, float x, float y, float theta, float phi, float v, float a );
+    void setVehicle( int id, float x, float y, float theta, float phi, float v, float a );
+
+    void readConfig(char *config_file);
 
 };
 
@@ -491,4 +493,40 @@ void Model::setVehicle( int id, float x, float y, float theta, float phi, float 
     vehicles[id]->set( x, y, theta, phi, v, a );
 }
 
+void Model::readConfig(char *config_file) {
+    std::string block;
+    int indent = 0;
 
+    std::ifstream file(config_file); // Open the file for reading
+    if (!file.is_open()) {
+        std::cerr << "Failed to open the file." << std::endl;
+        return;
+    }
+
+    std::string line;
+    while (std::getline(file, line)) { // Read the file line by line
+        if (line.size()) {
+            // Check if the line ends with a colon
+            if (line.back() == ':') {
+                // Print the line without the ending colon
+                block = line.substr(0, line.size() - 1);
+            }
+
+            // Count spaces until the first non-space character
+            size_t space_count = 0;
+            while (space_count < line.size() && line[space_count] == ' ') {
+                ++space_count;
+            }
+
+            // Check if the first non-space character is '-'
+            bool is_dash = (space_count < line.size() && line[space_count] == '-');
+
+            // Output the results
+            std::cout << space_count << " " << is_dash << " " << block << "\t|";
+            std::cout << line << std::endl;
+        }
+    }
+
+    file.close(); // Close the file
+    return;
+}

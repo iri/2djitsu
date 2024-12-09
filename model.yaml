@@ -1,0 +1,171 @@
+
+roadBlocks:
+  - type: RoadBlock
+    length: 100
+    width: 30
+    lon: 34.0522
+    lat: 12.2222
+    lanes:
+      - type: Road
+        bounds: [(0, 0), (0, 10), (100, 10), (100, 0)]
+        minSpeed: 30.0
+        maxSpeed: 60.0
+        optSpeed: 45.0
+        laneLines:
+          - type: CentreLine
+            points: [(0, 5), (100, 5)]
+          - type: EdgeLine
+            points: [(0, 0), (100, 0)]
+          - type: EdgeLine
+            points: [(0, 10), (100, 10)]
+          - type: BorderLineLeft
+            points: [(0, 0), (0, 10)]
+          - type: BorderLineRight
+            points: [(100, 0), (100, 10)]
+        laneDirections:
+          - waypoints: [(0, 1), (100, 1)]
+            in: [0, 1]
+            out: [100, 1]
+          - waypoints: [(100, 9), (0, 9)]
+            in: [100, 9]
+            out: [0, 9]
+        lanePoints:
+          - type: RoadSign
+            p: [50, 5]
+      - type: Road
+        bounds: [(0, 10), (0, 20), (100, 20), (100, 10)]
+        minSpeed: 30.0
+        maxSpeed: 60.0
+        optSpeed: 45.0
+        laneLines:
+          - type: CentreLine
+            points: [(0, 15), (100, 15)]
+          - type: EdgeLine
+            points: [(0, 10), (100, 10)]
+          - type: EdgeLine
+            points: [(0, 20), (100, 20)]
+          - type: BorderLineLeft
+            points: [(0, 10), (0, 20)]
+          - type: BorderLineRight
+            points: [(100, 10), (100, 20)]
+        laneDirections:
+          - waypoints: [(0, 11), (100, 11)]
+            in: [0, 11]
+            out: [100, 11]
+          - waypoints: [(100, 19), (0, 19)]
+            in: [100, 19]
+            out: [0, 19]
+        lanePoints:
+          - type: RoadSign
+            p: [75, 15]
+      - type: Road
+        bounds: [(0, 20), (0, 30), (100, 30), (100, 20)]
+        minSpeed: 30.0
+        maxSpeed: 60.0
+        optSpeed: 45.0
+        laneLines:
+          - type: CentreLine
+            points: [(0, 25), (100, 25)]
+          - type: EdgeLine
+            points: [(0, 20), (100, 20)]
+          - type: EdgeLine
+            points: [(0, 30), (100, 30)]
+          - type: BorderLineLeft
+            points: [(0, 20), (0, 30)]
+          - type: BorderLineRight
+            points: [(100, 20), (100, 30)]
+        laneDirections:
+          - waypoints: [(0, 21), (100, 21)]
+            in: [0, 21]
+            out: [100, 21]
+          - waypoints: [(100, 29), (0, 29)]
+            in: [100, 29]
+            out: [0, 29]
+        lanePoints:
+          - type: RoadSign
+            p: [25, 25]
+  - type: RoadBlock
+    length: 100
+    width: 30
+    lon: 34.0522
+    lat: 12.2122
+    lanes:
+      - type: Road
+        bounds: [(0, 0), (0, 10), (100, 10), (100, 0)]
+        minSpeed: 30.0
+        maxSpeed: 60.0
+        optSpeed: 45.0
+        laneLines:
+          - type: CentreLine
+            points: [(0, 5), (100, 5)]
+          - type: EdgeLine
+            points: [(0, 0), (100, 0)]
+          - type: EdgeLine
+            points: [(0, 10), (100, 10)]
+          - type: BorderLineLeft
+            points: [(0, 0), (0, 10)]
+          - type: BorderLineRight
+            points: [(100, 0), (100, 10)]
+        laneDirections:
+          - waypoints: [(0, 1), (100, 1)]
+            in: [0, 1]
+            out: [100, 1]
+          - waypoints: [(100, 9), (0, 9)]
+            in: [100, 9]
+            out: [0, 9]
+        lanePoints:
+          - type: RoadSign
+            p: [50, 5]
+      - type: Road
+        bounds: [(0, 10), (0, 20), (100, 20), (100, 10)]
+        minSpeed: 30.0
+        maxSpeed: 60.0
+        optSpeed: 45.0
+        laneLines:
+          - type: CentreLine
+            points: [(0, 15), (100, 15)]
+          - type: EdgeLine
+            points: [(0, 10), (100, 10)]
+          - type: EdgeLine
+            points: [(0, 20), (100, 20)]
+          - type: BorderLineLeft
+            points: [(0, 10), (0, 20)]
+          - type: BorderLineRight
+            points: [(100, 10), (100, 20)]
+        laneDirections:
+          - waypoints: [(0, 11), (100, 11)]
+            in: [0, 11]
+            out: [100, 11]
+          - waypoints: [(100, 19), (0, 19)]
+            in: [100, 19]
+            out: [0, 19]
+        lanePoints:
+          - type: RoadSign
+            p: [75, 15]
+      - type: Road
+        bounds: [(0, 20), (0, 30), (100, 30), (100, 20)]
+        minSpeed: 30.0
+        maxSpeed: 60.0
+        optSpeed: 45.0
+        laneLines:
+          - type: CentreLine
+            points: [(0, 25), (100, 25)]
+          - type: EdgeLine
+            points: [(0, 20), (100, 20)]
+          - type: EdgeLine
+            points: [(0, 30), (100, 30)]
+          - type: BorderLineLeft
+            points: [(0, 20), (0, 30)]
+          - type: BorderLineRight
+            points: [(100, 20), (100, 30)]
+        laneDirections:
+          - waypoints: [(0, 21), (100, 21)]
+            in: [0, 21]
+            out: [100, 21]
+          - waypoints: [(100, 29), (0, 29)]
+            in: [100, 29]
+            out: [0, 29]
+        lanePoints:
+          - type: RoadSign
+            p: [25, 25]
+

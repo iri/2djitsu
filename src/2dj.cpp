@@ -5,7 +5,6 @@
 #include <cmath>
 #include <data.hpp>
 
-
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
 
@@ -115,6 +114,8 @@ SDL_Texture* loadTexture( std::string path )
 int main( int argc, char* args[] )
 {	
 	auto M = std::make_unique<Model>();
+
+	M->readConfig("model.yaml");
 
 	M->addVehicle(std::make_unique<Vehicle>(2, 4, 0.5,0.5, 0,255,0,200, *M));
 	M->addVehicle(std::make_unique<Vehicle>(2, 4, 0.5,0.5, 255,0,0,200, *M));
