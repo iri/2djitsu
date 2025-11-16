@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <string>
 #include <cmath>
+#include <chrono>
+#include <thread>
 #include <data.hpp>
 
 const int SCREEN_WIDTH = 800;

@@ -4,10 +4,10 @@
 #include <memory>
 #include <string>
 #include <utility>
-#include <cmath>
 #include <fstream>
 #include <chrono>
 #include <thread>
+#include <SDL.h>
 
 
 class Vehicle;
@@ -162,6 +162,13 @@ public:
             startTask();
         }
 
+    ~Vehicle() {
+        // Ensure thread is joined before destruction
+        if (Thread.joinable()) {
+            Thread.join();
+        }
+    }
+
     void set( float x, float y, float theta, float phi, float v, float a )
     {
         this->x = x;
@@ -180,10 +187,12 @@ public:
         this->dtheta = this->v/this->L * std::tan(this->phi);
 
         // update state
-        this->x = this->x + this->dx * this->M.dt;
-        this->y = this->y + this->dy * this->M.dt;
-        this->theta = this->theta + this->dtheta * this->M.dt;
-        // this->v = this->v + this->a * this->M.dt;
+        // Convert dt from milliseconds to seconds
+        float dt_seconds = this->M.dt / 1000.0f;
+        this->x = this->x + this->dx * dt_seconds;
+        this->y = this->y + this->dy * dt_seconds;
+        this->theta = this->theta + this->dtheta * dt_seconds;
+        // this->v = this->v + this->a * dt_seconds;
 
         // std::cout 
         //     << "  " << this->M.dt 
